@@ -9,7 +9,7 @@ contract ArianeeWhitelist{
         return (whitelistedAddress[_tokenId][_sender] && !(optOutAddressPerOwner[_tokenOwner][_sender]));
     }
     
-    function addWhitelistdeAddress(uint256 _tokenId, address _address) public{
+    function addWhitelistedAddress(uint256 _tokenId, address _address) public{
         whitelistedAddress[_tokenId][_address] = true;
     }
     
