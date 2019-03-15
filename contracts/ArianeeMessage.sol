@@ -9,22 +9,26 @@ contract ERC721Interface {
     function ownerOf(uint256 _tokenId) public view returns(address);
 }
 
+
 contract ArianeeMessage{
     
     mapping(uint256 => Message[]) public messageList;
     
     ArianeeWhitelist whitelist;
     ERC721Interface smartAsset;
+    address arianeeStoreAddress;
     
     struct Message{
         string URI;
         bytes32 imprint;
         address sender;
+        address to;
     }
     
-    constructor(address _whitelistAddress, address _smartAssetAddress) public{
+    constructor(address _whitelistAddress, address _smartAssetAddress, address _arianeeStoreAddress) public{
         whitelist = ArianeeWhitelist(address(_whitelistAddress));
         smartAsset = ERC721Interface(address(_smartAssetAddress));
+        arianeeStoreAddress = _arianeeStoreAddress;
     }
     
     modifier canSendMessage(uint256 _tokenId, address _sender){
@@ -33,11 +37,17 @@ contract ArianeeMessage{
         _;
     }
     
-    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint) public canSendMessage(_tokenId, tx.origin){
+    modifier onlyStore(){
+        require(msg.sender == arianeeStoreAddress);
+        _;
+    }
+    
+    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint, address _to) public canSendMessage(_tokenId, tx.origin) onlyStore(){
         Message memory _message = Message({
             URI : _uri,
             imprint : _imprint,
-            sender : tx.origin
+            sender : tx.origin,
+            to : _to
         });
         
         messageList[_tokenId].push(_message);

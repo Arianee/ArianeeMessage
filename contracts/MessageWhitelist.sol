@@ -13,4 +13,8 @@ contract ArianeeWhitelist{
         whitelistedAddress[_tokenId][_address] = true;
     }
     
+    function addblacklistedAddress(address _sender, bool _activate) public{
+        optOutAddressPerOwner[msg.sender][_sender];
+    }
+    
 }
