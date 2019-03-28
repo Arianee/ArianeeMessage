@@ -41,8 +41,15 @@ contract ArianeeMessage{
         require(msg.sender == arianeeStoreAddress);
         _;
     }
-    
-    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint, address _to) public canSendMessage(_tokenId, tx.origin) onlyStore(){
+    /**
+     * @dev Send a message
+     * @notice can only be called by an whitelisted address and through the store
+     * @param _tokenId token associate to the message
+     * @param _uri URI of the message
+     * @param _imprint of the message
+     * @param _to receiver of the message
+     */
+    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint, address _to) public canSendMessage(_tokenId, tx.origin) onlyStore() returns(uint256){
         Message memory _message = Message({
             URI : _uri,
             imprint : _imprint,
@@ -50,7 +57,7 @@ contract ArianeeMessage{
             to : _to
         });
         
-        messageList[_tokenId].push(_message);
+        return messageList[_tokenId].push(_message);
     }
     
     
