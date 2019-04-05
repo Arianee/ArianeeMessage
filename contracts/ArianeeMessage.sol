@@ -1,5 +1,6 @@
 pragma solidity 0.5.1;
 
+import "@0xcert/ethereum-utils-contracts/src/contracts/permission/ownable.sol";
 
 contract ArianeeWhitelist{
     function isAuthorized(uint256 _tokenId, address _sender, address _tokenOwner) public view returns(bool);
@@ -10,9 +11,10 @@ contract ERC721Interface {
 }
 
 
-contract ArianeeMessage{
+contract ArianeeMessage is Ownable{
     
     mapping(uint256 => Message[]) public messageList;
+    mapping(uint256 => uint256[]) rewards;
     
     ArianeeWhitelist whitelist;
     ERC721Interface smartAsset;
@@ -42,6 +44,15 @@ contract ArianeeMessage{
         _;
     }
     /**
+     * @dev set a new store address
+     * @notice can only be called by the contract owner.
+     * @param _storeAddress new address of the store.
+     */
+    function setStoreAddress(address _storeAddress) public onlyOwner(){
+        arianeeStoreAddress = _storeAddress;
+    }
+    
+    /**
      * @dev Send a message
      * @notice can only be called by an whitelisted address and through the store
      * @param _tokenId token associate to the message
@@ -49,7 +60,7 @@ contract ArianeeMessage{
      * @param _imprint of the message
      * @param _to receiver of the message
      */
-    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint, address _to) public canSendMessage(_tokenId, tx.origin) onlyStore() returns(uint256){
+    function sendMessage(uint256 _tokenId, string memory _uri, bytes32 _imprint, address _to, uint256 _reward) public canSendMessage(_tokenId, tx.origin) onlyStore() returns(uint256){
         Message memory _message = Message({
             URI : _uri,
             imprint : _imprint,
@@ -57,7 +68,15 @@ contract ArianeeMessage{
             to : _to
         });
         
-        return messageList[_tokenId].push(_message);
+        uint256 _messageId = messageList[_tokenId].push(_message);
+        rewards[_tokenId].push(_reward);
+        return _messageId;
+    }
+    
+    function readMessage(uint256 _tokenId, uint256 _messageId) public onlyStore() returns(uint256){
+        uint256 reward = rewards[_tokenId][_messageId];
+        delete rewards[_tokenId][_messageId];
+        return reward;   
     }
     
     
