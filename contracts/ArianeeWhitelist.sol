@@ -10,6 +10,16 @@ Abilitable{
     
     uint8 constant ABILITY_ADD_WHITELIST = 1;
     
+    /**
+     * @dev This emits when a new address is whitelisted for a token
+     */
+    event WhitelistedAddressAdded(uint256 _tokenId, address _address);
+    
+    /**
+     * @dev This emits when an address is blacklisted by a NFT owner on a given token.
+     */
+    event BlacklistedAddresAdded(address _sender, uint256 _tokenId, bool _activate);
+    
     function isAuthorized(uint256 _tokenId, address _sender, address _tokenOwner) public view returns(bool){
         return (whitelistedAddress[_tokenId][_sender] && !(optOutAddressPerOwner[_tokenOwner][_tokenId][_sender]));
     }
@@ -22,6 +32,7 @@ Abilitable{
      */
     function addWhitelistedAddress(uint256 _tokenId, address _address) public hasAbility(ABILITY_ADD_WHITELIST){
         whitelistedAddress[_tokenId][_address] = true;
+        emit WhitelistedAddressAdded(_tokenId, _address);
     }
     
     /**
@@ -29,8 +40,9 @@ Abilitable{
      * @param _sender address to blacklist.
      * @param _activate blacklist or unblacklist the sender
      */
-    function addblacklistedAddress(address _sender, uint256 _tokenId, bool _activate) public{
+    function addBlacklistedAddress(address _sender, uint256 _tokenId, bool _activate) public{
         optOutAddressPerOwner[msg.sender][_tokenId][_sender] = _activate;
+        emit BlacklistedAddresAdded(_sender, _tokenId, _activate);
     }
     
 }
