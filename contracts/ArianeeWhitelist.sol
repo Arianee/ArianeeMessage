@@ -5,8 +5,8 @@ import "@0xcert/ethereum-utils-contracts/src/contracts/permission/abilitable.sol
 contract ArianeeWhitelist is
 Abilitable{
     
-    mapping(uint256=> mapping(address=>bool)) public whitelistedAddress;
-    mapping(address=> mapping(uint256=> mapping(address=>bool))) public optOutAddressPerOwner;
+    mapping(uint256=> mapping(address=>bool)) internal whitelistedAddress;
+    mapping(address=> mapping(uint256=> mapping(address=>bool))) internal optOutAddressPerOwner;
     
     uint8 constant ABILITY_ADD_WHITELIST = 1;
     
@@ -43,6 +43,14 @@ Abilitable{
     function addBlacklistedAddress(address _sender, uint256 _tokenId, bool _activate) public{
         optOutAddressPerOwner[msg.sender][_tokenId][_sender] = _activate;
         emit BlacklistedAddresAdded(_sender, _tokenId, _activate);
+    }
+    
+    function isWhitelisted(uint256 _tokenId, address _address) external view returns (bool _isWhitelisted){
+        _isWhitelisted = whitelistedAddress[_tokenId][_address];
+    }
+    
+    function isBlacklisted(address _owner, address _sender, uint256 _tokenId) external view returns(bool _isBlacklisted){
+        _isBlacklisted = optOutAddressPerOwner[_owner][_tokenId][_sender];
     }
     
 }
