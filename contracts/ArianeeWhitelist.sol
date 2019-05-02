@@ -8,7 +8,7 @@ Abilitable{
     mapping(uint256=> mapping(address=>bool)) internal whitelistedAddress;
     mapping(address=> mapping(uint256=> mapping(address=>bool))) internal optOutAddressPerOwner;
     
-    uint8 constant ABILITY_ADD_WHITELIST = 1;
+    uint8 constant ABILITY_ADD_WHITELIST = 2;
     
     /**
      * @dev This emits when a new address is whitelisted for a token
