@@ -65,7 +65,7 @@ Abilitable{
   /**
    * @dev Return if an address backlisted by a user for a given NFT.
    * @param _owner owner of the token id.
-   * @param _sender 
+   * @param _sender address to check.
    * @param _tokenId NFT to check.
    * @return true if address it whitelisted.
    */
