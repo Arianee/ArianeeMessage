@@ -1,4 +1,4 @@
-pragma solidity 0.5.1;
+pragma solidity 0.5.6;
 
 import "@0xcert/ethereum-utils-contracts/src/contracts/permission/abilitable.sol";
 
@@ -37,7 +37,7 @@ Abilitable{
    * @param _tokenId id of the nft
    * @param _address address to whitelist.
    */
-  function addWhitelistedAddress(uint256 _tokenId, address _address) public hasAbility(ABILITY_ADD_WHITELIST){
+  function addWhitelistedAddress(uint256 _tokenId, address _address) public hasAbilities(ABILITY_ADD_WHITELIST){
       whitelistedAddress[_tokenId][_address] = true;
       emit WhitelistedAddressAdded(_tokenId, _address);
   }
