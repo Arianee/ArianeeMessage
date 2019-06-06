@@ -4,7 +4,7 @@ import "@0xcert/ethereum-utils-contracts/src/contracts/permission/abilitable.sol
 
 contract ArianeeWhitelist is
 Abilitable{
-
+  
   /**
    * @dev Mapping from  token id to whitelisted address
    */
@@ -15,8 +15,6 @@ Abilitable{
    */
   mapping(address=> mapping(uint256=> mapping(address=>bool))) internal optOutAddressPerOwner;
 
-  uint8 constant ABILITY_ADD_WHITELIST = 2;
-
   /**
    * @dev This emits when a new address is whitelisted for a token
    */
@@ -26,10 +24,8 @@ Abilitable{
    * @dev This emits when an address is blacklisted by a NFT owner on a given token.
    */
   event BlacklistedAddresAdded(address _sender, uint256 _tokenId, bool _activate);
-
-  function isAuthorized(uint256 _tokenId, address _sender, address _tokenOwner) public view returns(bool){
-      return (whitelistedAddress[_tokenId][_sender] && !(optOutAddressPerOwner[_tokenOwner][_tokenId][_sender]));
-  }
+  
+  uint8 constant ABILITY_ADD_WHITELIST = 2;
 
   /**
    * @dev add an address to the whitelist for a nft.
@@ -37,7 +33,7 @@ Abilitable{
    * @param _tokenId id of the nft
    * @param _address address to whitelist.
    */
-  function addWhitelistedAddress(uint256 _tokenId, address _address) public hasAbilities(ABILITY_ADD_WHITELIST){
+  function addWhitelistedAddress(uint256 _tokenId, address _address) external hasAbilities(ABILITY_ADD_WHITELIST) {
       whitelistedAddress[_tokenId][_address] = true;
       emit WhitelistedAddressAdded(_tokenId, _address);
   }
@@ -47,9 +43,20 @@ Abilitable{
    * @param _sender address to blacklist.
    * @param _activate blacklist or unblacklist the sender
    */
-  function addBlacklistedAddress(address _sender, uint256 _tokenId, bool _activate) public{
+  function addBlacklistedAddress(address _sender, uint256 _tokenId, bool _activate) external {
       optOutAddressPerOwner[msg.sender][_tokenId][_sender] = _activate;
       emit BlacklistedAddresAdded(_sender, _tokenId, _activate);
+  }
+  
+  /**
+   * @dev Return if a sender is authorized to send  message to this owner.
+   * @param _tokenId NFT to check.
+   * @param _sender address to check.
+   * @param _tokenOwner owner of the token id.
+   * @return true if address it authorized.
+   */
+  function isAuthorized(uint256 _tokenId, address _sender, address _tokenOwner) external view returns(bool) {
+      return (whitelistedAddress[_tokenId][_sender] && !isBlacklisted(_tokenOwner, _sender, _tokenId));
   }
 
   /**
@@ -58,7 +65,7 @@ Abilitable{
    * @param _address address to check.
    * @return true if address it whitelisted.
    */
-  function isWhitelisted(uint256 _tokenId, address _address) external view returns (bool _isWhitelisted){
+  function isWhitelisted(uint256 _tokenId, address _address) public view returns (bool _isWhitelisted) {
       _isWhitelisted = whitelistedAddress[_tokenId][_address];
   }
 
@@ -67,9 +74,9 @@ Abilitable{
    * @param _owner owner of the token id.
    * @param _sender address to check.
    * @param _tokenId NFT to check.
-   * @return true if address it whitelisted.
+   * @return true if address it blacklisted.
    */
-  function isBlacklisted(address _owner, address _sender, uint256 _tokenId) external view returns(bool _isBlacklisted){
+  function isBlacklisted(address _owner, address _sender, uint256 _tokenId) public view returns(bool _isBlacklisted) {
       _isBlacklisted = optOutAddressPerOwner[_owner][_tokenId][_sender];
   }
 
